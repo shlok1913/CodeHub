@@ -43,11 +43,11 @@ It's designed for real-time, multi-file coding in JS/C++ with stdin input suppor
 
 ## 📸 Screenshots
 
-![alt text](image.png)
+![UI Screenshot](client/screenshots/login-window.png)
 
-![alt text](image-1.png)
+![UI Screenshot](client/screenshots/workspaces.png)
 
-![alt text](image-2.png)
+![UI Screenshot](client/screenshots/code-editor.png)
 
 ---
 
