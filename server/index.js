@@ -3,6 +3,8 @@ const cors = require("cors");
 
 const connectDB = require("./db");
 
+const authRoutes = require("./routes/auth");
+
 
 require("dotenv").config();
 
@@ -14,8 +16,15 @@ const PORT = process.env.PORT || 3001;
 
 connectDB(); // ⬅️ connect to MongoDB
 
+
+
+
 app.use(cors());
 app.use(express.json());
+
+
+
+app.use("/api/auth", authRoutes);
 
 
 
