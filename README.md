@@ -27,7 +27,7 @@ It's designed for real-time, multi-file coding in JS/C++ with stdin input suppor
 - 💾 **Auto-Save** – Code is saved to MongoDB automatically
 - ⬇️ **Download as ZIP** – Export entire workspace as a ZIP file
 - 💻 **Terminal UI** – Bottom sliding terminal like VS Code
-- 🎨 **Modern UI** – Built using Tailwind CSS with dark theme design
+- 🎨 **Modern UI** – Built using Tailwind CSS with dark theme design.
 
 ---
 
