@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+/* Hide scrollbar for tabs */
+.scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
