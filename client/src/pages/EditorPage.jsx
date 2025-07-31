@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
 import Header from "../components/Header";
@@ -7,16 +5,16 @@ import TreeNode from "../components/TreeNode";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 
-const templates = {
-  javascript: "// Write your JS code here",
-  cpp: `#include <iostream>
-using namespace std;
+// const templates = {
+//   javascript: "// Write your JS code here",
+//   cpp: `#include <iostream>
+// using namespace std;
 
-int main() {
-  cout << "Hello from C++" << endl;
-  return 0;
-}`,
-};
+// int main() {
+//   cout << "Hello from C++" << endl;
+//   return 0;
+// }`,
+// };
 
 export default function EditorPage() {
   const { id: workspaceId } = useParams(); // ✅ 'id' matches the route `/editor/:id`
@@ -42,19 +40,68 @@ export default function EditorPage() {
 
   const [isFullScreen, setIsFullScreen] = useState(false);
 
+  // const getLanguageFromExtension = (filename) => {
+  //   const ext = filename.split(".").pop().toLowerCase();
+  //   switch (ext) {
+  //     case "js":
+  //       return "javascript";
+  //     case "cpp":
+  //     case "cc":
+  //     case "cxx":
+  //       return "cpp";
+  //     default:
+  //       return "unsupported";
+  //   }
+  // };
+
   const getLanguageFromExtension = (filename) => {
-    const ext = filename.split(".").pop().toLowerCase();
-    switch (ext) {
-      case "js":
-        return "javascript";
-      case "cpp":
-      case "cc":
-      case "cxx":
-        return "cpp";
-      default:
-        return "unsupported";
-    }
-  };
+  const ext = filename.split(".").pop().toLowerCase();
+
+  switch (ext) {
+    case "js":
+      return "javascript";
+    case "cpp":
+    case "cc":
+    case "cxx":
+      return "cpp";
+    case "c":
+      return "c";
+    case "py":
+      return "python";
+    case "java":
+      return "java";
+    case "go":
+      return "go";
+    case "rb":
+      return "ruby";
+    default:
+      return "unsupported";
+  }
+};
+
+
+const getMonacoLanguage = (language) => {
+  switch (language) {
+    case "cpp":
+      return "cpp";
+    case "c":
+      return "c";
+    case "javascript":
+      return "javascript";
+    case "python":
+      return "python";
+    case "java":
+      return "java";
+    case "go":
+      return "go";
+    case "ruby":
+      return "ruby";
+    default:
+      return "plaintext"; // fallback for unsupported
+  }
+};
+
+
 
   useEffect(() => {
     if (!user || !token) return;
@@ -344,12 +391,14 @@ export default function EditorPage() {
 const handleExecute = async () => {
   setOutput("⏳ Queued for execution...");
   try {
-    const res = await fetch("http://localhost:3001/run", {
+    console.log("asdf");
+    const res = await fetch("http://localhost:3001/run/runn", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code, language, input: userInput }),
     });
     const data = await res.json();
+    console.log("WJGF");
     if (data.output) {
       setOutput(data.output);
     } else if (data.error) {
@@ -367,9 +416,7 @@ const handleExecute = async () => {
   useEffect(() => {
     if (!currentPath) return;
     const lang = getLanguageFromExtension(currentPath);
-    console.log(lang + "fuck you bitch");
     setLanguage(lang);
-    console.log(language + "fuck you my son");
   }, [currentPath]);
 
   return (
@@ -397,42 +444,51 @@ const handleExecute = async () => {
       {/* Main Editor Layout */}
       <div className="flex flex-col md:flex-row h-[calc(100vh-96px)]">
         {/* Sidebar */}
-        <div className="w-full md:w-64 bg-white border-r overflow-y-auto p-4">
-          <div className="mb-4 flex gap-2">
-            <button
-              onClick={() => handleNewFile(null)}
-              className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded text-sm"
-            >
-              + File
-            </button>
-            <button
-              onClick={() => handleNewFolder(null)}
-              className="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded text-sm"
-            >
-              + Folder
-            </button>
-          </div>
+        {/* Sidebar */}
+<div className="w-full md:w-64 bg-white border-r overflow-y-auto p-4">
+  {/* Workspace Name */}
+  <div className="text-lg font-semibold text-gray-800 mb-4 px-2 truncate">
+    📁 CodeHub
+  </div>
 
-          {fileTree.map((node) => (
-            <TreeNode
-              key={node.id}
-              node={node}
-              onSelect={(file) => {
-                const isOpen = openTabs.some((tab) => tab.name === file.name);
-                if (!isOpen) {
-                  setOpenTabs([...openTabs, { name: file.name, id: file.id }]);
-                }
-                setActiveTab(file.name);
-                setCurrentPath(file.name);
-                setCode(contentMap[file.name] || "");
-              }}
-              onNewFile={handleNewFile}
-              onNewFolder={handleNewFolder}
-              onRename={handleRename}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
+  {/* Action Buttons */}
+  <div className="mb-4 flex gap-2">
+    <button
+      onClick={() => handleNewFile(null)}
+      className="flex items-center gap-1 bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded text-sm"
+    >
+      <span>📄</span> File
+    </button>
+    <button
+      onClick={() => handleNewFolder(null)}
+      className="flex items-center gap-1 bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded text-sm"
+    >
+      <span>📁</span> Folder
+    </button>
+  </div>
+
+  {/* File Tree */}
+  {fileTree.map((node) => (
+    <TreeNode
+      key={node.id}
+      node={node}
+      onSelect={(file) => {
+        const isOpen = openTabs.some((tab) => tab.name === file.name);
+        if (!isOpen) {
+          setOpenTabs([...openTabs, { name: file.name, id: file.id }]);
+        }
+        setActiveTab(file.name);
+        setCurrentPath(file.name);
+        setCode(contentMap[file.name] || "");
+      }}
+      onNewFile={handleNewFile}
+      onNewFolder={handleNewFolder}
+      onRename={handleRename}
+      onDelete={handleDelete}
+    />
+  ))}
+</div>
+
 
         {/* Editor Panel */}
         <div
@@ -512,7 +568,7 @@ const handleExecute = async () => {
               {/* Code Editor */}
               <Editor
                 height="300px"
-                language={language === "cpp" ? "cpp" : "javascript"}
+                language={getMonacoLanguage(language)}
                 value={code}
                 onChange={(value) => {
                   const updated = value || "";
