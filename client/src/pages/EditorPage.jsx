@@ -4,17 +4,13 @@ import Header from "../components/Header";
 import TreeNode from "../components/TreeNode";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
+import useWebSocket from "../hooks/useWebSocket"; // adjust the path as needed
 
-// const templates = {
-//   javascript: "// Write your JS code here",
-//   cpp: `#include <iostream>
-// using namespace std;
 
-// int main() {
-//   cout << "Hello from C++" << endl;
-//   return 0;
-// }`,
-// };
+
+
+
+
 
 export default function EditorPage() {
   const { id: workspaceId } = useParams(); // ✅ 'id' matches the route `/editor/:id`
@@ -39,6 +35,9 @@ export default function EditorPage() {
   const [showTerminal, setShowTerminal] = useState(false);
 
   const [isFullScreen, setIsFullScreen] = useState(false);
+
+
+  const activeJobIdRef = useRef(null);
 
   // const getLanguageFromExtension = (filename) => {
   //   const ext = filename.split(".").pop().toLowerCase();
@@ -136,6 +135,18 @@ const getMonacoLanguage = (language) => {
     dfs(tree);
     return max;
   };
+
+
+const { socketRef, send } = useWebSocket((message) => {
+  console.log("📩 Message from server:", message);
+
+  // Only update output if the jobId matches
+  if (message.jobId === activeJobIdRef.current && message.type === 'result') {
+    console.log("shlokii");
+    setOutput(message.output);
+  }
+});
+
 
   const findNodeById = (nodes, targetId) => {
     for (const node of nodes) {
@@ -387,30 +398,36 @@ const getMonacoLanguage = (language) => {
     setShowTerminal(true);
     setOutput(""); // Optional: Clear output on new run
   };
-
 const handleExecute = async () => {
   setOutput("⏳ Queued for execution...");
+
   try {
-    console.log("asdf");
     const res = await fetch("http://localhost:3001/run/runn", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code, language, input: userInput }),
     });
+
     const data = await res.json();
-    console.log("WJGF");
-    if (data.output) {
-      setOutput(data.output);
-    } else if (data.error) {
-      setOutput(`❌ ${data.error}`);
+
+    if (data.jobId) {
+      setOutput("⏳ Job queued. Waiting for result...");
+
+      const jobId = data.jobId;
+      activeJobIdRef.current = jobId; // 👈 Store current job ID
+
+      send({ type: "subscribe", jobId }); // 👈 Tell WebSocket server we're interested
     } else {
-      setOutput("❌ Unknown error occurred");
+      setOutput("❌ Failed to enqueue job");
     }
   } catch (err) {
-    setOutput("❌ Error connecting to server");
+    setOutput("❌ Server error");
     console.error(err);
   }
 };
+
+
+
 
 
   useEffect(() => {
