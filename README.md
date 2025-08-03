@@ -149,40 +149,41 @@ REDIS_PORT=6379
 
 ---
 
+> ### 🧪 Message Queue & Pub/Sub Workflow
 
-### 🧪 Message Queue & Pub/Sub Workflow
-
-
-### sequenceDiagram
-Frontend ->> Backend: POST /api/run
-Backend ->> Redis (BullMQ): Add job to queue
-Worker ->> Docker: Run code
-Worker ->> Redis Pub/Sub: job:{id}:result
-WebSocket Server ->> Frontend: Stream output
-
-
----
-
-
-### 📘 Notes
-Job status (Queued, Running, Completed, TLE) is streamed live
-
-Frontend listens to job updates via WebSocket
-
-Docker is required for secure sandboxed execution
-
+```mermaid
+sequenceDiagram
+  Frontend ->> Backend: POST /api/run
+  Backend ->> Redis (BullMQ): Add job to queue
+  Worker ->> Docker: Run code
+  Worker ->> Redis Pub/Sub: job:{id}:result
+  WebSocket Server ->> Frontend: Stream output
+```
 
 ---
 
+> ### 📘 Notes
 
-## 🧠 Inspiration
-
-This project is inspired by **Replit**, **CodePen**, and **Visual Studio Code Web**.
-
-Built for learning and showcasing system design, secure code execution, and beautiful UI/UX.
+- Job status (`Queued`, `Running`, `Completed`, `TLE`) is streamed live.
+- Frontend listens to job updates via WebSocket.
+- Docker is required for secure sandboxed code execution.
 
 ---
 
-## 📜 License
+> ## 🧠 Inspiration
 
-This project is licensed under the MIT License. -->
+This project is inspired by:
+- **Replit**
+- **CodePen**
+- **Visual Studio Code Web**
+
+> Built to learn and showcase:
+- 🏗️ System Design
+- 🔒 Secure Code Execution
+- 🎨 Beautiful UI/UX
+
+---
+
+> ## 📜 License
+
+This project is licensed under the **MIT License**.
