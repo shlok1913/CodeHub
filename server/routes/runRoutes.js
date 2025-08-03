@@ -22,17 +22,12 @@ router.post("/runn", async (req, res) => {
   try {
     const job = await addCodeJob({ code, input, language });
 
-    const result = await withTimeout(
-      job.waitUntilFinished(codeQueueEvents),
-      20000
-    );
-
-    res.json({ output: result });
+    // Instead of waiting for the result, immediately respond with jobId
+    res.json({ jobId: job.id });
   } catch (err) {
     res.status(500).json({
-      error: "Execution failed",
+      error: "Failed to enqueue job",
       details: err.message,
-      jobId: err?.jobId || "unknown",
     });
   }
 });

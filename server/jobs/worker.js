@@ -4,19 +4,58 @@ console.log("👷 Worker process starting...");
 const { Worker } = require("bullmq");
 const connection = require("../redis");
 const runCodeInDocker = require("../docker/runCodeInDocker");
+const Redis = require("ioredis");
 
+const pub = new Redis(); // Redis publisher
 
 console.log("🔌 Initializing Worker with Redis...");
 const worker = new Worker(
   "code-execution",
   async (job) => {
     const { code, language, input } = job.data;
-    return await runCodeInDocker(code, language, input);
+
+    // 🔄 Send progress update BEFORE actual execution
+    await pub.publish(
+      `job:${job.id}:result`,
+      JSON.stringify({
+        type: "progress",
+        message: "Running your code...",
+        jobId: job.id, // ✅ Add this
+      })
+    );
+
+    try {
+      const output = await runCodeInDocker(code, language, input);
+
+      // publish successful result
+      await pub.publish(
+        `job:${job.id}:result`,
+        JSON.stringify({
+          type: "result",
+          output,
+          jobId: job.id, // ✅ Add this
+        })
+      );
+
+      return { output };
+    } catch (err) {
+      // publish error
+      await pub.publish(
+        `job:${job.id}:result`,
+        JSON.stringify({
+          type: "error",
+          error: err.message || "Unknown error",
+          jobId: job.id, // ✅ Add this
+        })
+      );
+
+      throw err;
+    }
   },
   {
     connection,
-    concurrency: 1, // Execute one job at a time
-    lockDuration: 60000, // Lock the job for 60 seconds
+    concurrency: 1,
+    lockDuration: 60000,
   }
 );
 
