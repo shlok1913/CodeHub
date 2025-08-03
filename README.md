@@ -49,6 +49,8 @@
 
 ## 🧱 Project Structure
 
+```
+
 CodeHub/
 ├── client/ # React frontend
 │ ├── components/
@@ -63,6 +65,7 @@ CodeHub/
 │ └── ...
 └── README.md
 
+```
 
 ---
 
@@ -80,28 +83,32 @@ CodeHub/
 ## 🚀 Running Locally
 
 ### 1. Clone the Repository
+```bash
 git clone https://github.com/YOUR_USERNAME/CodeHub.git
 cd CodeHub
+```
 
 ### 2. Start Backend (server)
+```bash
 cd server
 npm install
 node index.js        # Express server
 node ws-server.js # WebSocket server
 node jobs/worker.js # Queue worker
-
+```
 
 ## 3. Start Frontend (client)
+```bash
 cd ../client
 npm install
 npm run dev
-
+```
 
 ---
 
 
 
-📦 Docker-based Code Execution
+### 📦 Docker-based Code Execution
 The backend uses Docker to run code securely.
 
 # Example: server/docker/runCodeInDocker.js
