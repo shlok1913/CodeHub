@@ -183,7 +183,3 @@ This project is inspired by:
 - 🎨 Beautiful UI/UX
 
 ---
-
-> ## 📜 License
-
-This project is licensed under the **MIT License**.
